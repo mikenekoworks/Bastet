@@ -7,10 +7,10 @@ using Bastet.Input.Gesture;
 namespace Bastet.Input.Touch {
 	public class TouchManager : MonoBehaviour {
 
-		public TouchEvent EventTouchBegan;
-        public TouchEvent EventTouchMoved;
-        public TouchEvent EventTouchStationary;
-        public TouchEvent EventTouchEnd;
+		public TouchEventHandler EventTouchBegan;
+        public TouchEventHandler EventTouchMoved;
+        public TouchEventHandler EventTouchStationary;
+        public TouchEventHandler EventTouchEnd;
 
         [SerializeField]
         private GestureSwipe cachedSwipeComponent;

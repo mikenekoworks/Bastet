@@ -6,6 +6,6 @@ using UnityEngine.Events;
 namespace Bastet.Input.Touch {
 
     [System.Serializable]
-	public class TouchEvent : UnityEvent<TouchData> { }
+	public class TouchEventHandler : UnityEvent<TouchData> { }
 
 }   // end of namespace Bastet.Input.Touch;

@@ -64,11 +64,11 @@ namespace Bastet.Input.Gesture {
         private float distanceThreshold;
 
         [SerializeField]
-        public GestureEvent EventSwipeStart;
+        public GestureEventHandler EventSwipeStart;
         [SerializeField]
-        public GestureSwipeEvent EventSwipeDetect;
+        public GestureSwipeEventHandler EventSwipeDetect;
         [SerializeField]
-        public GestureEvent EventSwipeFinish;
+        public GestureEventHandler EventSwipeFinish;
 
         /// <summary>
         /// スワイプのデバッグ表示をGLで行うか？
@@ -144,8 +144,8 @@ namespace Bastet.Input.Gesture {
                 pos_diff -= finger_data.LastPosition;
                 pos_diff.Normalize();
 
-                float last_angle = Mathf.Atan2( finger_data.Direction.y, finger_data.Direction.x ) * Mathf.Rad2Deg;
-                float new_angle = Mathf.Atan2( pos_diff.y, pos_diff.x ) * Mathf.Rad2Deg;
+                //float last_angle = Mathf.Atan2( finger_data.Direction.y, finger_data.Direction.x ) * Mathf.Rad2Deg;
+                //float new_angle = Mathf.Atan2( pos_diff.y, pos_diff.x ) * Mathf.Rad2Deg;
 
                 float angle = Vector3.Dot( finger_data.Direction, pos_diff );
 
@@ -158,7 +158,7 @@ namespace Bastet.Input.Gesture {
             finger_data.LastPosition = touch_data.Position;
 
             // イベントを発火
-            if ( distanceThreshold < finger_data.Length ) {
+            if ( Math.UnitConvert.MillimeterToPixel( distanceThreshold, Screen.dpi ) < finger_data.Length ) {
                 finger_data.IsAvailable = true;
                 EventSwipeDetect.Invoke( finger_data.FingerId, finger_data.Direction, finger_data.Length );
             }

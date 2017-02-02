@@ -11,16 +11,28 @@ namespace Bastet.Input.Gesture {
     public class GestureSwipeEditor : Editor {
 
         SerializedProperty scriptProperty;
+
+        bool eventFoldout = false;
+
         SerializedProperty isReverseDirectionResetProperty;
         SerializedProperty angleThreshouldProperty;
         SerializedProperty enableDebugLineRendererProperty;
         SerializedProperty cachedDebugLineRendererProperty;
+
+        SerializedProperty eventSwipeStartProperty;
+        SerializedProperty eventSwipeDetectProperty;
+        SerializedProperty eventSwipeFinishProperty;
 
         void OnEnable() {
             scriptProperty = serializedObject.FindProperty( "m_Script" );
             isReverseDirectionResetProperty = serializedObject.FindProperty( "isReverseDirectionReset" );
             enableDebugLineRendererProperty = serializedObject.FindProperty( "enableDebugGLRenderer" );
             cachedDebugLineRendererProperty = serializedObject.FindProperty( "cachedDebugGLRenderer" );
+
+
+            eventSwipeStartProperty = serializedObject.FindProperty( "EventSwipeStart" );
+            eventSwipeDetectProperty = serializedObject.FindProperty( "EventSwipeDetect" );
+            eventSwipeFinishProperty = serializedObject.FindProperty( "EventSwipeFinish" );
         }
 
         void OnDisale() {
@@ -42,14 +54,14 @@ namespace Bastet.Input.Gesture {
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField( enableDebugLineRendererProperty );
             if ( EditorGUI.EndChangeCheck() == true ) {
-                
+
                 if ( enableDebugLineRendererProperty.boolValue == true ) {
 
                     var comp = Camera.main.gameObject.GetOrAddComponent<Bastet.Graphics.GLRendering.GLRenderer>();
                     cachedDebugLineRendererProperty.objectReferenceValue = comp;
 
                     if ( comp.DrawMaterial == null ) {
-                        comp.DrawMaterial = new Material( Shader.Find ("Unlit/Color") );
+                        comp.DrawMaterial = new Material( Shader.Find( "Unlit/Color" ) );
                     }
 
                 } else {
@@ -66,7 +78,15 @@ namespace Bastet.Input.Gesture {
                 EditorGUILayout.LabelField( "Finger Id: " + gesture.GetFingerData( i ).FingerId );
 
             }
-            
+
+            eventFoldout = EditorGUILayout.Foldout( eventFoldout, "Swipe Events" );
+            if ( eventFoldout == true ) {
+
+                EditorGUILayout.PropertyField( eventSwipeStartProperty );
+                EditorGUILayout.PropertyField( eventSwipeDetectProperty );
+                EditorGUILayout.PropertyField( eventSwipeFinishProperty );
+            }
+
             //DrawDefaultInspector();
             serializedObject.ApplyModifiedProperties();
         }

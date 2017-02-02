@@ -10,10 +10,10 @@ namespace Bastet.Input.Touch {
 
 		static List<TouchData> touches = new List<TouchData>();
 
-		public static TouchEvent EventTouchBegan = new TouchEvent();
-		public static TouchEvent EventTouchMoved = new TouchEvent();
-		public static TouchEvent EventTouchStationary = new TouchEvent();
-		public static TouchEvent EventTouchEnd = new TouchEvent();
+		public static TouchEventHandler EventTouchBegan = new TouchEventHandler();
+		public static TouchEventHandler EventTouchMoved = new TouchEventHandler();
+		public static TouchEventHandler EventTouchStationary = new TouchEventHandler();
+		public static TouchEventHandler EventTouchEnd = new TouchEventHandler();
 
 		public static int GetTouchDataCount() {
 			return touches.Count;
