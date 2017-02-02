@@ -8,6 +8,9 @@ using Bastet.Input.Touch;
 namespace Bastet.Input.Gesture {
 
     [System.Serializable]
-    public class GestureEvent : UnityEvent<TouchData> { }
+    public class GestureEvent : UnityEvent< int > { }
+
+    [System.Serializable]
+    public class GestureSwipeEvent : UnityEvent<int, Vector3, float> { }
 
 }

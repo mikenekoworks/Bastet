@@ -58,7 +58,20 @@ namespace Bastet.Input.Gesture {
         private bool isReverseDirectionReset;
 
         /// <summary>
-        /// スワイプ方向が継続する角度
+        /// スワイプを検知する距離（単位はミリメートル）
+        /// </summary>
+        [SerializeField]
+        private float distanceThreshold;
+
+        [SerializeField]
+        public GestureEvent EventSwipeStart;
+        [SerializeField]
+        public GestureSwipeEvent EventSwipeDetect;
+        [SerializeField]
+        public GestureEvent EventSwipeFinish;
+
+        /// <summary>
+        /// スワイプのデバッグ表示をGLで行うか？
         /// </summary>
         [SerializeField]
         private bool enableDebugGLRenderer;
@@ -85,13 +98,24 @@ namespace Bastet.Input.Gesture {
             return new_finger;
         }
 
+        /// <summary>
+        /// スワイプの開始
+        /// </summary>
+        /// <param name="touch_data"></param>
         public void OnStart( TouchData touch_data ) {
 
             Debug.Log( "Swipe Start." );
 
             fingerList.Add( CreateFingerData( touch_data ) );
 
+            EventSwipeStart.Invoke( touch_data.FingerId );
+
         }
+
+        /// <summary>
+        /// スワイプ情報の更新
+        /// </summary>
+        /// <param name="touch_data"></param>
         public void OnUpdate( TouchData touch_data ) {
             //Debug.Log( "Swipe Update." );
 
@@ -102,10 +126,12 @@ namespace Bastet.Input.Gesture {
             }
 
             if ( touch_data.Phase == TouchPhase.Stationary ) {
+#if DEBUG
                 // 座標が動いていないので終了。
                 if ( cachedDebugGLRenderer != null ) {
                     cachedDebugGLRenderer.AddLine( finger_data.StartPosition, finger_data.LastPosition, Color.red );
                 }
+#endif
                 return;
             }
 
@@ -131,71 +157,41 @@ namespace Bastet.Input.Gesture {
             }
             finger_data.LastPosition = touch_data.Position;
 
+            // イベントを発火
+            if ( distanceThreshold < finger_data.Length ) {
+                finger_data.IsAvailable = true;
+                EventSwipeDetect.Invoke( finger_data.FingerId, finger_data.Direction, finger_data.Length );
+            }
+
+#if DEBUG
             if ( cachedDebugGLRenderer != null ) {
                 cachedDebugGLRenderer.AddLine( finger_data.StartPosition, finger_data.LastPosition, Color.red );
             }
-
-            //finger_data.LastPosition = touch_data.Position;
-            //finger_data.Direction = finger_data.LastPosition - finger_data.StartPosition;
-
-            //Debug.Log( new_pos_diff );
-
-            //// 長辺を調べる。
-            //if ( Mathf.Abs( new_pos_diff.x ) < Mathf.Abs( new_pos_diff.y ) ) {
-            //    // 縦方向に長いのは判定としていらないので開始座標を更新する
-            //    startPosition = new_pos;
-            //    lastPosition = new_pos;
-
-            //    return;
-            //}
-
-            // 横に長いので左右のどちらを向いているかを取得
-            //float sign = Mathf.Sign( new_pos_diff.x );
-
-            //// 前回の方向と比較
-            //if ( LastPosition == StartPosition ) {
-            //    // 前回と座標が同じ場合はLastの座標だけを更新して終了。
-            //    lastPosition = new_pos;
-            //    return;
-
-            //}
-
-            // 違いがある場合は向きとかを判定するよ。
-            //Vector2 last_pos_diff = LastPosition - StartPosition;
-            //float last_sign = Mathf.Sign( last_pos_diff.x );
-
-            //if ( ( ( sign < 0 ) && ( last_sign < 0 ) ) || ( ( sign >= 0 ) && ( last_sign >= 0 ) ) ) {
-            //    // ベクトルが同じ方向
-            //} else {
-            //    // ベクトルが違う方向なら終端を更新
-            //    startPosition = new_pos;
-            //    lastPosition = new_pos;
-            //    return;
-            //}
-
-            //lastPosition = new_pos;
-
-            //// 指定された閾値（mm）をインチ換算してDPIから必要なピクセル値に戻す
-            //float need_pixel = MathUtility.MillimeterToPixel( Managers.MusicDataManager.Instance.Params.SwipeThreshould );
-            //var v = ( LastPosition - StartPosition );
-
-            //if ( Mathf.Abs( v.x ) > need_pixel ) {
-
-            //    // スワイプが成功したよ
-            //    isAvailable = true;
-
-            //    if ( v.x < 0.0f ) {
-            //        swipeDirection = NoteSwipeDirectionType.Left;
-            //    } else {
-            //        swipeDirection = NoteSwipeDirectionType.Right;
-            //    }
-            //}
-
+#endif
         }
+
+        /// <summary>
+        /// スワイプ処理の終了
+        /// </summary>
+        /// <param name="touch_data"></param>
         public void OnFinish( TouchData touch_data ) {
             Debug.Log( "Swipe Finish." );
 
             // データ削除前にやることがあるなら先にやる
+            var finger_data = fingerList.Find( _ => _.FingerId == touch_data.FingerId );
+            if ( finger_data == null ) {
+                return;
+            }
+
+            finger_data.LastPosition = touch_data.Position;
+
+            // イベントを発火
+            if ( distanceThreshold < finger_data.Length ) {
+                finger_data.IsAvailable = true;
+                EventSwipeDetect.Invoke( finger_data.FingerId, finger_data.Direction, finger_data.Length );
+            }
+
+            EventSwipeFinish.Invoke( finger_data.FingerId );
 
             // データの削除
             fingerList.RemoveAll( _ => _.FingerId == touch_data.FingerId );
