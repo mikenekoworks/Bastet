@@ -2,13 +2,13 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.Collections.Generic;
-	
-[CustomPropertyDrawer(typeof(EnumPopupStringAttribute))]
-public class EnumPopupStringDrawer : PropertyDrawer {
+
+[CustomPropertyDrawer( typeof( EnumStringPopupAttribute ) )]
+public class EnumStringPopupDrawer : PropertyDrawer {
 
 	public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
-	
-		EnumPopupStringAttribute popup = (EnumPopupStringAttribute)attribute;
+
+        EnumStringPopupAttribute popup = ( EnumStringPopupAttribute )attribute;
 
 		System.Array array = System.Enum.GetValues( popup.PopupType );
 		string[] popup_list = new string[ array.Length ];
